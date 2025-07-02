@@ -74,6 +74,11 @@
         width: 18px;
       }
 
+      table {
+        width: auto !important;
+        table-layout: auto !important;
+      }
+
       input {
         width: 140px;
       }
@@ -121,19 +126,13 @@
       for (let i = 0; i < dias.length; i++) {
         const dia = parseInt(dias[i]);
         const fecha = new Date(anio, mesIndex, dia);
-        const diaSemana = fecha.getDay(); // 0 = domingo, 1 = lunes, ...
+        const diaSemana = fecha.getDay();
         const letra = getDiaSemanaLetras(fecha);
 
-        // Si es el primer día y no es lunes, añadimos vacíos al inicio
         if (i === 0 && diaSemana !== 1) {
           const vaciosAntes = diaSemana === 0 ? 6 : diaSemana - 1;
           for (let j = 0; j < vaciosAntes; j++) {
-            semana.push({
-              dia: '',
-              letra: '',
-              asignacion: '',
-              indexDia: j
-            });
+            semana.push({ dia: '', letra: '', asignacion: '', indexDia: j });
           }
         }
 
@@ -152,12 +151,7 @@
 
       if (semana.length > 0) {
         while (semana.length < 7) {
-          semana.push({
-            dia: '',
-            letra: '',
-            asignacion: '',
-            indexDia: semana.length
-          });
+          semana.push({ dia: '', letra: '', asignacion: '', indexDia: semana.length });
         }
         semanas.push(semana);
       }
@@ -198,14 +192,12 @@
 
           const semanas = agruparPorSemanas(dias, asignaciones, mesIndex, anio);
 
-          // Mostrar el nombre del técnico solo una vez al inicio
           resultadoDiv.innerHTML += `<h3>Técnico: ${mesData.nombre}</h3>`;
 
           semanas.forEach((semana, idx) => {
             let html = `<div class="tabla-mes"><h4>${mesNombre} - Semana ${idx + 1}</h4>`;
             html += `<div style="overflow-x:auto;"><table>`;
 
-            // Fila: letras de los días
             html += `<tr>`;
             semana.forEach(d => {
               const esFinde = d.letra === 'S' || d.letra === 'D';
@@ -213,7 +205,6 @@
             });
             html += `</tr>`;
 
-            // Fila: fechas
             html += `<tr>`;
             semana.forEach(d => {
               const esFinde = d.letra === 'S' || d.letra === 'D';
@@ -221,7 +212,6 @@
             });
             html += `</tr>`;
 
-            // Fila: asignaciones
             html += `<tr>`;
             semana.forEach(d => {
               const esFinde = d.letra === 'S' || d.letra === 'D';
