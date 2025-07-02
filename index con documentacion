@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Consulta de Turnos - CUADRANTE 2025</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding: 1rem;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        input {
+            padding: 6px;
+            font-size: 14px;
+            width: 140px;
+        }
+
+        button {
+            padding: 8px 10px;
+            font-size: 14px;
+            margin-left: 5px;
+        }
+
+        .botones {
+            margin-top: 1rem;
+        }
+
+        .tabla-mes {
+            margin-bottom: 40px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            min-width: 500px;
+            table-layout: fixed; /* Fuerza distribución pareja */
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 4px;
+            text-align: center;
+            font-size: 12px;
+            word-wrap: break-word;
+        }
+
+        th:first-child,
+        td:first-child {
+            width: 80px; /* Espacio para nombre técnico en escritorio */
+        }
+
+        th {
+            background: #eee;
+        }
+
+        .error {
+            color: red;
+            margin-top: 1rem;
+        }
+
+        .finde {
+            background-color: #ffcc99 !important; /* naranja claro */
+        }
+
+        @media (max-width: 500px) {
+            th, td {
+            font-size: 9px;
+            padding: 2px;
+            width: 10px; /* Tamaño de cada celda de día en móvil */
+            }
+
+            th:first-child,
+            td:first-child {
+            width: 20px; /* Espacio para nombre técnico en móvil */
+            }
+
+            input {
+            width: 140px; /* Campo DNI en móvil */
+            }
+
+            button {
+            width: 100%;
+            margin-bottom: 8px;
+            }
+
+            .botones {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            }
+        }
+        </style>
+</head>
+<body>
+<img src="LOGO_MANSERA.PNG" alt="Logo de la empresa" style="height: 60px; margin-bottom: 10px;">
+  <h2>Consulta tu Programación</h2>
+  <p>Introduce tu DNI para ver tus asignaciones del mes<br><br>Ingresa los Numeros del DNI; luego un guion (-) y la Letra al Final en MAYUSCULA.</p>
+
+  <input type="text" id="dniInput" placeholder="Introduce tu DNI">
+  <p style="font-weight: bold; color: #333; margin-top: 10px;">
+  <br>"TEN EN CUENTA QUE ESTA PROGRAMACIÓN PUEDE CAMBIAR"<br><br>CONSULTA CADA VEZ QUE QUIERAS <br>PARA MANTENERTE ACTUALIZADO<br>
+  <br>
+  </p>
+  <div class="botones">
+    <button onclick="consultar()">Consultar</button>
+    <!--<button onclick="descargarPDF()">Descargar como PDF</button>-->
+  </div>
+
+  <div id="resultado"></div>
+
+  <!-- html2pdf.js desde CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+        <!-- el <head> y <style> siguen igual que tu versión, así que aquí solo va el cambio importante dentro del <script> -->
+        <script>
+        function getDiaSemanaLetras(fecha) {
+            const letras = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
+            return letras[fecha.getDay()];
+        }
+
+        function agruparPorSemanas(dias, asignaciones, mesIndex, anio) {
+            const semanas = [];
+            let semana = [];
+
+            for (let i = 0; i < dias.length; i++) {
+            const dia = parseInt(dias[i]);
+            const fecha = new Date(anio, mesIndex, dia);
+            const diaSemana = fecha.getDay(); // 0 = domingo, 1 = lunes, ...
+            const letra = getDiaSemanaLetras(fecha);
+
+            semana.push({
+                dia: dia,
+                letra: letra,
+                asignacion: asignaciones[i],
+                indexDia: diaSemana
+            });
+
+            if ((semana.length === 7) || (i === dias.length - 1)) {
+                semanas.push(semana);
+                semana = [];
+            }
+            }
+
+            return semanas;
+        }
+
+        async function consultar() {
+            const dni = document.getElementById('dniInput').value.trim();
+            const resultadoDiv = document.getElementById("resultado");
+            resultadoDiv.innerHTML = "";
+
+            if (!dni) {
+            resultadoDiv.innerHTML = "<p class='error'>Por favor, introduce un DNI válido.</p>";
+            return;
+            }
+
+            const url = `https://script.google.com/macros/s/AKfycbz97OzNUEULG_waTarAlESaR6nUXbxxz99L3bIr2nJFf7dpl2mdEmjs4XT6omdr_qj4eA/exec?dni=${dni}`;
+            <!--https://script.google.com/macros/s/AKfycbz97OzNUEULG_waTarAlESaR6nUXbxxz99L3bIr2nJFf7dpl2mdEmjs4XT6omdr_qj4eA/exec-->
+
+            try {
+            const res = await fetch(url);
+            const data = await res.json();
+
+            if (data.error) {
+                resultadoDiv.innerHTML = `<p class='error'>${data.error}</p>`;
+                return;
+            }
+
+            const hoy = new Date();
+            const anio = hoy.getFullYear();
+
+            data.forEach((mesData) => {
+                const mesNombre = mesData.mes;
+                const mesIndex = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'].indexOf(mesNombre);
+                const dias = mesData.dias.map(d => parseInt(d));
+                const asignaciones = mesData.asignaciones;
+
+                const semanas = agruparPorSemanas(dias, asignaciones, mesIndex, anio);
+
+                semanas.forEach((semana, idx) => {
+                let html = `<div class="tabla-mes"><h3>${mesNombre} - Semana ${idx + 1}</h3>`;
+                html += `<div style="overflow-x:auto;"><table><tr><th>Día</th>`;
+
+                semana.forEach(d => {
+                    const esFinde = d.letra === 'S' || d.letra === 'D';
+                    html += `<th class="${esFinde ? 'finde' : ''}">${d.letra}</th>`;
+                });
+
+                html += `</tr><tr><th>Fecha</th>`;
+                semana.forEach(d => {
+                    const esFinde = d.letra === 'S' || d.letra === 'D';
+                    html += `<td class="${esFinde ? 'finde' : ''}">${d.dia || ''}</td>`;
+                });
+
+                html += `</tr><tr><th>${mesData.nombre}</th>`;
+                semana.forEach(d => {
+                    const esFinde = d.letra === 'S' || d.letra === 'D';
+                    html += `<td class="${esFinde ? 'finde' : ''}">${d.asignacion || ''}</td>`;
+                });
+
+                html += `</tr></table></div></div>`;
+                resultadoDiv.innerHTML += html;
+                });
+            });
+
+            } catch (error) {
+            resultadoDiv.innerHTML = `<p class='error'>Error al consultar los datos.</p>`;
+            console.error("Error en la consulta:", error);
+            }
+        }
+        </script>
+
+
+</body>
+</html>
