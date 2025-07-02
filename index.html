@@ -71,7 +71,12 @@
       th, td {
         font-size: 9px;
         padding: 2px;
-        width: 15px;
+      }
+
+      .celda-dia {
+        width: 15px !important;
+        max-width: 15px !important;
+        min-width: 15px !important;
       }
 
       table {
@@ -204,21 +209,21 @@
             html += `<tr>`;
             semana.forEach(d => {
               const esFinde = d.letra === 'S' || d.letra === 'D';
-              html += `<th class="${esFinde ? 'finde' : ''}">${d.letra}</th>`;
+              html += `<th class="celda-dia ${esFinde ? 'finde' : ''}">${d.letra}</th>`;
             });
             html += `</tr>`;
 
             html += `<tr>`;
             semana.forEach(d => {
               const esFinde = d.letra === 'S' || d.letra === 'D';
-              html += `<td class="${esFinde ? 'finde' : ''}">${d.dia || ''}</td>`;
+              html += `<td class="celda-dia ${esFinde ? 'finde' : ''}">${d.dia || ''}</td>`;
             });
             html += `</tr>`;
 
             html += `<tr>`;
             semana.forEach(d => {
               const esFinde = d.letra === 'S' || d.letra === 'D';
-              html += `<td class="${esFinde ? 'finde' : ''}">${d.asignacion || ''}</td>`;
+              html += `<td class="celda-dia ${esFinde ? 'finde' : ''}">${d.asignacion || ''}</td>`;
             });
             html += `</tr>`;
 
