@@ -48,10 +48,8 @@
 
     th, td {
       border: 1px solid #ccc;
-      padding: 4px;
       text-align: center;
       font-size: 12px;
-      word-wrap: break-word;
     }
 
     th {
@@ -69,19 +67,23 @@
 
     @media (max-width: 500px) {
       th, td {
-        font-size: 9px;
-        padding: 2px;
+        font-size: 8px;
+        padding: 0;
+        word-wrap: normal;
       }
 
       .celda-dia {
         width: 10px !important;
-        max-width: 10px !important;
         min-width: 10px !important;
+        max-width: 10px !important;
+        overflow: hidden;
+        text-overflow: clip;
+        white-space: nowrap;
       }
 
       table {
         width: auto !important;
-        table-layout: auto !important;
+        table-layout: fixed !important;
       }
 
       input {
