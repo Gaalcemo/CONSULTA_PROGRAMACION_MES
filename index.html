@@ -4,238 +4,241 @@
   <meta charset="UTF-8">
   <title>Consulta de Turnos - CUADRANTE 2025</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            padding: 1rem;
-            max-width: 1000px;
-            margin: auto;
-        }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 1rem;
+      max-width: 1000px;
+      margin: auto;
+    }
 
-        h2 {
-            color: #333;
-        }
+    h2, h3, h4 {
+      color: #333;
+    }
 
-        input {
-            padding: 6px;
-            font-size: 14px;
-            width: 140px;
-        }
+    input {
+      padding: 6px;
+      font-size: 14px;
+      width: 140px;
+    }
 
-        button {
-            padding: 8px 10px;
-            font-size: 14px;
-            margin-left: 5px;
-        }
+    button {
+      padding: 8px 10px;
+      font-size: 14px;
+      margin-left: 5px;
+    }
 
-        .botones {
-            margin-top: 1rem;
-        }
+    .botones {
+      margin-top: 1rem;
+    }
 
-        .tabla-mes {
-            margin-bottom: 40px;
-            overflow-x: auto;
-        }
+    .tabla-mes {
+      margin-bottom: 40px;
+      overflow-x: auto;
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            min-width: 500px;
-            table-layout: fixed;
-        }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      min-width: 500px;
+      table-layout: fixed;
+    }
 
-        th, td {
-            border: 1px solid #ccc;
-            padding: 4px;
-            text-align: center;
-            font-size: 12px;
-            word-wrap: break-word;
-        }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 4px;
+      text-align: center;
+      font-size: 12px;
+      word-wrap: break-word;
+    }
 
-        th:first-child,
-        td:first-child {
-            width: 70px;
-        }
+    th {
+      background: #eee;
+    }
 
-        th {
-            background: #eee;
-        }
+    .error {
+      color: red;
+      margin-top: 1rem;
+    }
 
-        .error {
-            color: red;
-            margin-top: 1rem;
-        }
+    .finde {
+      background-color: #ffcc99 !important;
+    }
 
-        .finde {
-            background-color: #ffcc99 !important; /* naranja claro */
-        }
+    @media (max-width: 500px) {
+      th, td {
+        font-size: 9px;
+        padding: 2px;
+        width: 30px;
+      }
 
-        @media (max-width: 500px) {
-            th, td {
-            font-size: 11px;
-            padding: 2px;
-            width: 8px;
-            }
+      input {
+        width: 140px;
+      }
 
-            th:first-child,
-            td:first-child {
-            width: 10px;
-            }
+      button {
+        width: 100%;
+        margin-bottom: 8px;
+      }
 
-            input {
-            width: 140px;
-            }
-
-            button {
-            width: 100%;
-            margin-bottom: 8px;
-            }
-
-            .botones {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            }
-        }
-        </style>
+      .botones {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
 </head>
 <body>
-<img src="LOGO_MANSERA.PNG" alt="Logo de la empresa" style="height: 60px; margin-bottom: 10px;">
+  <img src="LOGO_MANSERA.PNG" alt="Logo de la empresa" style="height: 60px; margin-bottom: 10px;">
   <h2>Consulta tu Programación</h2>
-  <p>Introduce tu DNI para ver tus asignaciones del mes<br><br>Ingresa los Numeros del DNI; luego un guion (-) y la Letra al Final en MAYUSCULA.</p>
+  <p>Introduce tu DNI para ver tus asignaciones del mes.<br><br>Ingresa los Números del DNI; luego un guion (-) y la Letra en MAYÚSCULA.</p>
 
   <input type="text" id="dniInput" placeholder="Introduce tu DNI">
   <p style="font-weight: bold; color: #333; margin-top: 10px;">
-  <br>"TEN EN CUENTA QUE ESTA PROGRAMACIÓN PUEDE CAMBIAR"<br><br>CONSULTA CADA VEZ QUE QUIERAS <br>PARA MANTENERTE ACTUALIZADO<br>
-  <br>
+    <br>"TEN EN CUENTA QUE ESTA PROGRAMACIÓN PUEDE CAMBIAR"<br><br>
+    CONSULTA CADA VEZ QUE QUIERAS <br>
+    PARA MANTENERTE ACTUALIZADO<br><br>
   </p>
   <div class="botones">
     <button onclick="consultar()">Consultar</button>
   </div>
 
   <div id="resultado"></div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
   <script>
-        function getDiaSemanaLetras(fecha) {
-            const letras = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
-            return letras[fecha.getDay()];
+    function getDiaSemanaLetras(fecha) {
+      const letras = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
+      return letras[fecha.getDay()];
+    }
+
+    function agruparPorSemanas(dias, asignaciones, mesIndex, anio) {
+      const semanas = [];
+      let semana = [];
+
+      for (let i = 0; i < dias.length; i++) {
+        const dia = parseInt(dias[i]);
+        const fecha = new Date(anio, mesIndex, dia);
+        const diaSemana = fecha.getDay(); // 0 = domingo, 1 = lunes, ...
+        const letra = getDiaSemanaLetras(fecha);
+
+        // Si es el primer día y no es lunes, añadimos vacíos al inicio
+        if (i === 0 && diaSemana !== 1) {
+          const vaciosAntes = diaSemana === 0 ? 6 : diaSemana - 1;
+          for (let j = 0; j < vaciosAntes; j++) {
+            semana.push({
+              dia: '',
+              letra: '',
+              asignacion: '',
+              indexDia: j
+            });
+          }
         }
 
-        function agruparPorSemanas(dias, asignaciones, mesIndex, anio) {
-          const semanas = [];
-          let semana = [];
-      
-          for (let i = 0; i < dias.length; i++) {
-              const dia = parseInt(dias[i]);
-              const fecha = new Date(anio, mesIndex, dia);
-              const diaSemana = fecha.getDay(); // 0 = domingo, 1 = lunes, ...
-      
-              const letra = getDiaSemanaLetras(fecha);
-              if (i === 0 && diaSemana !== 1) {
-                  const vaciosAntes = diaSemana === 0 ? 6 : diaSemana - 1;
-                  for (let j = 0; j < vaciosAntes; j++) {
-                      semana.push({
-                          dia: '',
-                          letra: '',
-                          asignacion: '',
-                          indexDia: j
-                      });
-                  }
-              }
-      
-              semana.push({
-                  dia: dia,
-                  letra: letra,
-                  asignacion: asignaciones[i],
-                  indexDia: diaSemana
-              });
-           if (semana.length === 7) {
-                  semanas.push(semana);
-                  semana = [];
-              }
-          }
-          if (semana.length > 0) {
-              while (semana.length < 7) {
-                  semana.push({
-                      dia: '',
-                      letra: '',
-                      asignacion: '',
-                      indexDia: semana.length
-                  });
-              }
-              semanas.push(semana);
-          }
-      
-          return semanas;
+        semana.push({
+          dia: dia,
+          letra: letra,
+          asignacion: asignaciones[i],
+          indexDia: diaSemana
+        });
+
+        if (semana.length === 7) {
+          semanas.push(semana);
+          semana = [];
+        }
       }
 
-
-        async function consultar() {
-            const dni = document.getElementById('dniInput').value.trim();
-            const resultadoDiv = document.getElementById("resultado");
-            resultadoDiv.innerHTML = "";
-
-            if (!dni) {
-            resultadoDiv.innerHTML = "<p class='error'>Por favor, introduce un DNI válido.</p>";
-            return;
-            }
-
-            const url = `https://script.google.com/macros/s/AKfycbz97OzNUEULG_waTarAlESaR6nUXbxxz99L3bIr2nJFf7dpl2mdEmjs4XT6omdr_qj4eA/exec?dni=${dni}`;
-            try {
-            const res = await fetch(url);
-            const data = await res.json();
-
-            if (data.error) {
-                resultadoDiv.innerHTML = `<p class='error'>${data.error}</p>`;
-                return;
-            }
-
-            const hoy = new Date();
-            const anio = hoy.getFullYear();
-
-            data.forEach((mesData) => {
-                const mesNombre = mesData.mes;
-                const mesIndex = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'].indexOf(mesNombre);
-                const dias = mesData.dias.map(d => parseInt(d));
-                const asignaciones = mesData.asignaciones;
-
-                const semanas = agruparPorSemanas(dias, asignaciones, mesIndex, anio);
-
-                semanas.forEach((semana, idx) => {
-                let html = `<div class="tabla-mes"><h3>${mesNombre} - Semana ${idx + 1}</h3>`;
-                html += `<div style="overflow-x:auto;"><table><tr><th>Día</th>`;
-
-                semana.forEach(d => {
-                    const esFinde = d.letra === 'S' || d.letra === 'D';
-                    html += `<th class="${esFinde ? 'finde' : ''}">${d.letra}</th>`;
-                });
-
-                html += `</tr><tr><th>Fecha</th>`;
-                semana.forEach(d => {
-                    const esFinde = d.letra === 'S' || d.letra === 'D';
-                    html += `<td class="${esFinde ? 'finde' : ''}">${d.dia || ''}</td>`;
-                });
-
-                html += `</tr><tr><th>${mesData.nombre}</th>`;
-                semana.forEach(d => {
-                    const esFinde = d.letra === 'S' || d.letra === 'D';
-                    html += `<td class="${esFinde ? 'finde' : ''}">${d.asignacion || ''}</td>`;
-                });
-
-                html += `</tr></table></div></div>`;
-                resultadoDiv.innerHTML += html;
-                });
-            });
-
-            } catch (error) {
-            resultadoDiv.innerHTML = `<p class='error'>Error al consultar los datos.</p>`;
-            console.error("Error en la consulta:", error);
-            }
+      if (semana.length > 0) {
+        while (semana.length < 7) {
+          semana.push({
+            dia: '',
+            letra: '',
+            asignacion: '',
+            indexDia: semana.length
+          });
         }
-        </script>
+        semanas.push(semana);
+      }
 
+      return semanas;
+    }
 
+    async function consultar() {
+      const dni = document.getElementById('dniInput').value.trim().toUpperCase();
+      const resultadoDiv = document.getElementById("resultado");
+      resultadoDiv.innerHTML = "";
+
+      const dniRegex = /^[0-9]{7,8}-[A-Z]$/;
+      if (!dniRegex.test(dni)) {
+        resultadoDiv.innerHTML = "<p class='error'>Por favor, introduce un DNI válido. Ej: 12345678-Z</p>";
+        return;
+      }
+
+      const url = `https://script.google.com/macros/s/AKfycbz97OzNUEULG_waTarAlESaR6nUXbxxz99L3bIr2nJFf7dpl2mdEmjs4XT6omdr_qj4eA/exec?dni=${encodeURIComponent(dni)}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.error) {
+          resultadoDiv.innerHTML = `<p class='error'>${data.error}</p>`;
+          return;
+        }
+
+        const hoy = new Date();
+        const anio = hoy.getFullYear();
+
+        data.forEach((mesData) => {
+          const mesNombre = mesData.mes;
+          const mesIndex = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'].indexOf(mesNombre);
+          const dias = mesData.dias.map(d => parseInt(d));
+          const asignaciones = mesData.asignaciones;
+
+          const semanas = agruparPorSemanas(dias, asignaciones, mesIndex, anio);
+
+          // Mostrar el nombre del técnico solo una vez al inicio
+          resultadoDiv.innerHTML += `<h3>Técnico: ${mesData.nombre}</h3>`;
+
+          semanas.forEach((semana, idx) => {
+            let html = `<div class="tabla-mes"><h4>${mesNombre} - Semana ${idx + 1}</h4>`;
+            html += `<div style="overflow-x:auto;"><table>`;
+
+            // Fila: letras de los días
+            html += `<tr>`;
+            semana.forEach(d => {
+              const esFinde = d.letra === 'S' || d.letra === 'D';
+              html += `<th class="${esFinde ? 'finde' : ''}">${d.letra}</th>`;
+            });
+            html += `</tr>`;
+
+            // Fila: fechas
+            html += `<tr>`;
+            semana.forEach(d => {
+              const esFinde = d.letra === 'S' || d.letra === 'D';
+              html += `<td class="${esFinde ? 'finde' : ''}">${d.dia || ''}</td>`;
+            });
+            html += `</tr>`;
+
+            // Fila: asignaciones
+            html += `<tr>`;
+            semana.forEach(d => {
+              const esFinde = d.letra === 'S' || d.letra === 'D';
+              html += `<td class="${esFinde ? 'finde' : ''}">${d.asignacion || ''}</td>`;
+            });
+            html += `</tr>`;
+
+            html += `</table></div></div>`;
+            resultadoDiv.innerHTML += html;
+          });
+        });
+
+      } catch (error) {
+        resultadoDiv.innerHTML = `<p class='error'>Error al consultar los datos.</p>`;
+        console.error("Error en la consulta:", error);
+      }
+    }
+  </script>
 </body>
 </html>
