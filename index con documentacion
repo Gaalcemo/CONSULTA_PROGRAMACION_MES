@@ -43,7 +43,7 @@
             border-collapse: collapse;
             background: white;
             min-width: 500px;
-            table-layout: fixed; /* Fuerza distribución pareja */
+            table-layout: fixed;
         }
 
         th, td {
@@ -56,7 +56,7 @@
 
         th:first-child,
         td:first-child {
-            width: 80px; /* Espacio para nombre técnico en escritorio */
+            width: 70px;
         }
 
         th {
@@ -74,18 +74,18 @@
 
         @media (max-width: 500px) {
             th, td {
-            font-size: 9px;
+            font-size: 11px;
             padding: 2px;
-            width: 10px; /* Tamaño de cada celda de día en móvil */
+            width: 8px;
             }
 
             th:first-child,
             td:first-child {
-            width: 20px; /* Espacio para nombre técnico en móvil */
+            width: 10px;
             }
 
             input {
-            width: 140px; /* Campo DNI en móvil */
+            width: 140px;
             }
 
             button {
@@ -113,46 +113,64 @@
   </p>
   <div class="botones">
     <button onclick="consultar()">Consultar</button>
-    <!--<button onclick="descargarPDF()">Descargar como PDF</button>-->
   </div>
 
   <div id="resultado"></div>
-
-  <!-- html2pdf.js desde CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-        <!-- el <head> y <style> siguen igual que tu versión, así que aquí solo va el cambio importante dentro del <script> -->
-        <script>
+  <script>
         function getDiaSemanaLetras(fecha) {
             const letras = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
             return letras[fecha.getDay()];
         }
 
         function agruparPorSemanas(dias, asignaciones, mesIndex, anio) {
-            const semanas = [];
-            let semana = [];
+          const semanas = [];
+          let semana = [];
+      
+          for (let i = 0; i < dias.length; i++) {
+              const dia = parseInt(dias[i]);
+              const fecha = new Date(anio, mesIndex, dia);
+              const diaSemana = fecha.getDay(); // 0 = domingo, 1 = lunes, ...
+      
+              const letra = getDiaSemanaLetras(fecha);
+              if (i === 0 && diaSemana !== 1) {
+                  const vaciosAntes = diaSemana === 0 ? 6 : diaSemana - 1;
+                  for (let j = 0; j < vaciosAntes; j++) {
+                      semana.push({
+                          dia: '',
+                          letra: '',
+                          asignacion: '',
+                          indexDia: j
+                      });
+                  }
+              }
+      
+              semana.push({
+                  dia: dia,
+                  letra: letra,
+                  asignacion: asignaciones[i],
+                  indexDia: diaSemana
+              });
+           if (semana.length === 7) {
+                  semanas.push(semana);
+                  semana = [];
+              }
+          }
+          if (semana.length > 0) {
+              while (semana.length < 7) {
+                  semana.push({
+                      dia: '',
+                      letra: '',
+                      asignacion: '',
+                      indexDia: semana.length
+                  });
+              }
+              semanas.push(semana);
+          }
+      
+          return semanas;
+      }
 
-            for (let i = 0; i < dias.length; i++) {
-            const dia = parseInt(dias[i]);
-            const fecha = new Date(anio, mesIndex, dia);
-            const diaSemana = fecha.getDay(); // 0 = domingo, 1 = lunes, ...
-            const letra = getDiaSemanaLetras(fecha);
-
-            semana.push({
-                dia: dia,
-                letra: letra,
-                asignacion: asignaciones[i],
-                indexDia: diaSemana
-            });
-
-            if ((semana.length === 7) || (i === dias.length - 1)) {
-                semanas.push(semana);
-                semana = [];
-            }
-            }
-
-            return semanas;
-        }
 
         async function consultar() {
             const dni = document.getElementById('dniInput').value.trim();
@@ -165,8 +183,6 @@
             }
 
             const url = `https://script.google.com/macros/s/AKfycbz97OzNUEULG_waTarAlESaR6nUXbxxz99L3bIr2nJFf7dpl2mdEmjs4XT6omdr_qj4eA/exec?dni=${dni}`;
-            <!--https://script.google.com/macros/s/AKfycbz97OzNUEULG_waTarAlESaR6nUXbxxz99L3bIr2nJFf7dpl2mdEmjs4XT6omdr_qj4eA/exec-->
-
             try {
             const res = await fetch(url);
             const data = await res.json();
