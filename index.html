@@ -129,30 +129,59 @@
         }
 
         function agruparPorSemanas(dias, asignaciones, mesIndex, anio) {
-            const semanas = [];
-            let semana = [];
+          const semanas = [];
+          let semana = [];
+      
+          for (let i = 0; i < dias.length; i++) {
+              const dia = parseInt(dias[i]);
+              const fecha = new Date(anio, mesIndex, dia);
+              const diaSemana = fecha.getDay(); // 0 = domingo, 1 = lunes, ...
+      
+              const letra = getDiaSemanaLetras(fecha);
+      
+              // Si es el primer día y no es lunes, añadimos espacios en blanco
+              if (i === 0 && diaSemana !== 1) {
+                  const vaciosAntes = diaSemana === 0 ? 6 : diaSemana - 1;
+                  for (let j = 0; j < vaciosAntes; j++) {
+                      semana.push({
+                          dia: '',
+                          letra: '',
+                          asignacion: '',
+                          indexDia: j
+                      });
+                  }
+              }
+      
+              semana.push({
+                  dia: dia,
+                  letra: letra,
+                  asignacion: asignaciones[i],
+                  indexDia: diaSemana
+              });
+      
+              // Si ya tenemos 7 días (lunes a domingo), guardamos la semana
+              if (semana.length === 7) {
+                  semanas.push(semana);
+                  semana = [];
+              }
+          }
+      
+          // Rellenar días vacíos al final si la última semana no tiene 7 días
+          if (semana.length > 0) {
+              while (semana.length < 7) {
+                  semana.push({
+                      dia: '',
+                      letra: '',
+                      asignacion: '',
+                      indexDia: semana.length
+                  });
+              }
+              semanas.push(semana);
+          }
+      
+          return semanas;
+      }
 
-            for (let i = 0; i < dias.length; i++) {
-            const dia = parseInt(dias[i]);
-            const fecha = new Date(anio, mesIndex, dia);
-            const diaSemana = fecha.getDay(); // 0 = domingo, 1 = lunes, ...
-            const letra = getDiaSemanaLetras(fecha);
-
-            semana.push({
-                dia: dia,
-                letra: letra,
-                asignacion: asignaciones[i],
-                indexDia: diaSemana
-            });
-
-            if ((semana.length === 7) || (i === dias.length - 1)) {
-                semanas.push(semana);
-                semana = [];
-            }
-            }
-
-            return semanas;
-        }
 
         async function consultar() {
             const dni = document.getElementById('dniInput').value.trim();
