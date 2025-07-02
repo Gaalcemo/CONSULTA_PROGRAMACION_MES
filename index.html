@@ -71,7 +71,7 @@
       th, td {
         font-size: 9px;
         padding: 2px;
-        width: 18px;
+        width: 15px;
       }
 
       table {
@@ -195,6 +195,9 @@
           resultadoDiv.innerHTML += `<h3>Técnico: ${mesData.nombre}</h3>`;
 
           semanas.forEach((semana, idx) => {
+            const tieneAsignaciones = semana.some(d => d.asignacion && d.asignacion.trim() !== '');
+            if (!tieneAsignaciones) return;
+
             let html = `<div class="tabla-mes"><h4>${mesNombre} - Semana ${idx + 1}</h4>`;
             html += `<div style="overflow-x:auto;"><table>`;
 
