@@ -5,99 +5,100 @@
   <title>Consulta de Turnos - CUADRANTE 2025</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    /* Tus estilos permanecen igual */
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      padding: 1rem;
-      max-width: 1000px;
-      margin: auto;
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        padding: 1rem;
+        max-width: 1000px;
+        margin: auto;
     }
 
     h2 {
-      color: #333;
+        color: #333;
     }
 
     input {
-      padding: 6px;
-      font-size: 14px;
-      width: 140px;
+        padding: 6px;
+        font-size: 14px;
+        width: 140px;
     }
 
     button {
-      padding: 8px 10px;
-      font-size: 14px;
-      margin-left: 5px;
+        padding: 8px 10px;
+        font-size: 14px;
+        margin-left: 5px;
     }
 
     .botones {
-      margin-top: 1rem;
+        margin-top: 1rem;
     }
 
     .tabla-mes {
-      margin-bottom: 40px;
-      overflow-x: auto;
+        margin-bottom: 40px;
+        overflow-x: auto;
     }
 
     table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      min-width: 500px;
-      table-layout: fixed;
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        min-width: 500px;
+        table-layout: fixed;
     }
 
     th, td {
-      border: 1px solid #ccc;
-      padding: 4px;
-      text-align: center;
-      font-size: 12px;
-      word-wrap: break-word;
+        border: 1px solid #ccc;
+        padding: 4px;
+        text-align: center;
+        font-size: 12px;
+        word-wrap: break-word;
     }
 
     th:first-child,
     td:first-child {
-      width: 80px;
+        width: 80px;
     }
 
     th {
-      background: #eee;
+        background: #eee;
     }
 
     .error {
-      color: red;
-      margin-top: 1rem;
+        color: red;
+        margin-top: 1rem;
     }
 
     .finde {
-      background-color: #ffcc99 !important;
+        background-color: #ffcc99 !important;
     }
 
     @media (max-width: 500px) {
-      th, td {
+        th, td {
         font-size: 9px;
         padding: 2px;
         width: 10px;
-      }
+        }
 
-      th:first-child,
-      td:first-child {
+        th:first-child,
+        td:first-child {
         width: 20px;
-      }
+        }
 
-      input {
+        input {
         width: 140px;
-      }
+        }
 
-      button {
+        button {
         width: 100%;
         margin-bottom: 8px;
-      }
+        }
 
-      .botones {
+        .botones {
         display: flex;
         flex-direction: column;
         gap: 10px;
-      }
+        }
     }
   </style>
 </head>
@@ -138,19 +139,6 @@
         const diaSemana = fecha.getDay();
         const letra = getDiaSemanaLetras(fecha);
 
-        // Si es el primer día y no es lunes, añadimos espacios en blanco al inicio
-        if (i === 0 && diaSemana !== 1) {
-          const vaciosAntes = diaSemana === 0 ? 6 : diaSemana - 1;
-          for (let j = 0; j < vaciosAntes; j++) {
-            semana.push({
-              dia: '',
-              letra: '',
-              asignacion: '',
-              indexDia: j
-            });
-          }
-        }
-
         semana.push({
           dia: dia,
           letra: letra,
@@ -158,22 +146,10 @@
           indexDia: diaSemana
         });
 
-        if (semana.length === 7) {
+        if ((semana.length === 7) || (i === dias.length - 1)) {
           semanas.push(semana);
           semana = [];
         }
-      }
-
-      if (semana.length > 0) {
-        while (semana.length < 7) {
-          semana.push({
-            dia: '',
-            letra: '',
-            asignacion: '',
-            indexDia: semana.length
-          });
-        }
-        semanas.push(semana);
       }
 
       return semanas;
