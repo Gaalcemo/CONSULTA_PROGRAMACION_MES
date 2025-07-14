@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<! este INDEX entrega la programacion de todo el mes, tiene mejoras sugeridas por CHATGPT, como bloqueo del boton de consultar mientras se muestra la respuesta JSON>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
